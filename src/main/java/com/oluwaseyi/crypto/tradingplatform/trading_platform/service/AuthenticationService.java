@@ -10,6 +10,8 @@ import com.oluwaseyi.crypto.tradingplatform.trading_platform.entity.User;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.AuthenticationException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.UserAlreadyExistException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.repository.UserRepository;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.utils.EmailService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,7 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-
+@Slf4j
 public class AuthenticationService {
 
     @Autowired
@@ -33,11 +35,20 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
 
-    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService) {
+
+    @Autowired
+    private final EmailService emailService;
+
+    @Autowired
+    private final OtpService otpService;
+
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtService jwtService, EmailService emailService, OtpService otpService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.emailService = emailService;
+        this.otpService = otpService;
     }
 
 
