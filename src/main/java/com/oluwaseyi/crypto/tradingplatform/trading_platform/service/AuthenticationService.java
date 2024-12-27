@@ -3,14 +3,18 @@ package com.oluwaseyi.crypto.tradingplatform.trading_platform.service;
 
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.AuthenticationRequest;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.request.RegisterRequest;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.request.ResetPasswordRequest;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.response.AuthenticationResponse;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.config.JwtService;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.entity.Role;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.entity.User;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.AuthenticationException;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.InvalidOtpException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.UserAlreadyExistException;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.UserNotFoundException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.repository.UserRepository;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.utils.EmailService;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.utils.OtpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -110,6 +114,29 @@ public class AuthenticationService {
             // Handle incorrect email or password
             throw new AuthenticationException("Invalid email or password");
         }
+    }
+
+
+
+    public void initiatePasswordReset(String email) throws Exception {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        String otp = otpService.generateOTP();
+        otpService.saveOTP(email, otp);
+        emailService.sendOtpEmail(email, otp);
+    }
+
+    public void resetPassword(ResetPasswordRequest request) throws Exception {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (!otpService.validateOTP(request.getEmail(), request.getOtp())) {
+            throw new InvalidOtpException("Invalid or expired OTP");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }
 

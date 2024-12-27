@@ -13,7 +13,7 @@ public class ResetPasswordRequest {
     private String otp;
 
     @NotBlank
-    @Size(min = 8, max = 20)
+    @Size(min = 4, max = 20)
     private String newPassword;
 
     public @Email @NotBlank String getEmail() {
