@@ -123,6 +123,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         String otp = otpService.generateOTP();
+        System.out.println(otp);
         otpService.saveOTP(email, otp);
         emailService.sendOtpEmail(email, otp);
     }
