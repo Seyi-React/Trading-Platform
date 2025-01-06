@@ -24,6 +24,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class AuthenticationService {
@@ -123,7 +125,6 @@ public class AuthenticationService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         String otp = otpService.generateOTP();
-        System.out.println(otp);
         otpService.saveOTP(email, otp);
         emailService.sendOtpEmail(email, otp);
     }
@@ -139,5 +140,9 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+
+     public List<User> findAllUsers() {
+      return   userRepository.findAll();
+     }
 }
 

@@ -6,6 +6,7 @@ import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.request.ForgotP
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.request.RegisterRequest;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.request.ResetPasswordRequest;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.DTO.response.AuthenticationResponse;
+import com.oluwaseyi.crypto.tradingplatform.trading_platform.entity.User;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.AuthenticationException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.InvalidOtpException;
 import com.oluwaseyi.crypto.tradingplatform.trading_platform.exception.UserAlreadyExistException;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -89,6 +91,17 @@ public class UserController {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Failed to reset password"));
         }
+    }
+
+    @GetMapping("users")
+    public ResponseEntity<List<?>> findAll(){
+       List<User> users = authenticationService.findAllUsers();
+        try {
+            return ResponseEntity.ok(users);
+        } catch (Exception e){
+            System.out.println("error fetching users");
+        }
+        return null;
     }
 
 
